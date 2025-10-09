@@ -23,6 +23,23 @@ else:
 
 cur = conn.cursor()
 
+# def get_connection():
+#     """
+#     Returns a new database connection depending on environment.
+#     """
+#     if os.environ.get("DATABASE_URL"):
+#         # Use Render's PostgreSQL database
+#         return psycopg2.connect(os.environ.get("DATABASE_URL"))
+#     else:
+#         # Use local PostgreSQL
+#         return psycopg2.connect(
+#             dbname='nalepo',
+#             user='postgres',
+#             password='leshan1234',
+#             host='localhost',
+#             port='5432'
+#         )
+
 
 # fetching data
 def fetch_users():
@@ -104,11 +121,21 @@ def insert_users(values):
     conn.commit()
     
 
+# def insert_campaigns(values):
+#     insert = "insert into campaigns(title,description,goal_amount,start_date,end_date)values(%s,%s,%s,%s,%s)"
+#     cur.execute(insert,values)
+#     conn.commit()
+#     cur.close()
+
 def insert_campaigns(values):
-    insert = "insert into campaigns(title,description,goal_amount,start_date,end_date)values(%s,%s,%s,%s,%s)"
-    cur.execute(insert,values)
-    conn.commit()
-    cur.close()
+    with conn.cursor() as cur:
+        insert = """
+            INSERT INTO campaigns (title, description, goal_amount, start_date, end_date)
+            VALUES (%s, %s, %s, %s, %s)
+        """
+        cur.execute(insert, values)
+        conn.commit()
+
 
    
 
@@ -130,11 +157,20 @@ def insert_volunteers(values):
     conn.commit()
     cur.close()
 
+# def insert_events(values):
+#     insert = "insert into events(title,description,event_date,location)values(%s,%s,%s,%s)"
+#     cur.execute(insert,values)
+#     conn.commit()
+#     cur.close()
+
 def insert_events(values):
-    insert = "insert into events(title,description,event_date,location)values(%s,%s,%s,%s)"
-    cur.execute(insert,values)
-    conn.commit()
-    cur.close()
+    with conn.cursor() as cur:
+        insert = """
+            INSERT INTO events (title, description, event_date, location)
+            VALUES (%s, %s, %s, %s)
+        """
+        cur.execute(insert, values)
+        conn.commit()
 
 def insert_event_registration(values):
     insert = "insert into event_registration(event_id,user_id)values(%s,%s)"

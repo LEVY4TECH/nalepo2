@@ -15,6 +15,14 @@
         <label class="form-label">Content</label>
         <textarea name="desc" rows="6" class="form-control" required>{{ event[2] }}</textarea>
       </div>
+      <div class="mb-3">
+        <label class="form-label">Event date</label>
+        <textarea name="edate" rows="6" class="form-control" required>{{ event[3] }}</textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Location</label>
+        <textarea name="location" rows="6" class="form-control" required>{{ event[4] }}</textarea>
+      </div>
       <button type="submit" class="btn btn-primary">Update Event</button>
       <a href="/events" class="btn btn-secondary">Cancel</a>
     </form>
