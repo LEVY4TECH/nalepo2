@@ -1,12 +1,12 @@
 import os
 
-from flask import Flask,render_template,request,redirect,url_for,session,flash
+from flask import Flask,render_template,request,redirect,url_for,session,flash,jsonify
 
 import requests
 
 from requests.auth import HTTPBasicAuth
 
-import base64
+import base64, datetime
 
 from datetime import datetime
 
@@ -19,7 +19,17 @@ from functools import wraps
 from flask_mail import Mail, Message
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY')
+app.config['SECRET_KEY'] = os.environ.get('kkjuyuhn') or 'dev-secret'
+print("SECRET KEY SET:", bool(app.config['SECRET_KEY']))
+
+# Sandbox credentials from Safaricom Daraja
+CONSUMER_KEY = "GvKZ5FuE0pwcFQNQL8Uc9jKjkLy08UHG4AqnAP5of46zGGVD"
+CONSUMER_SECRET = "brKiCJnuX1AiAeE5AV56ZXuyAZnypeGYeFAv7SvRn4KIFUEl0NfWETtuyaKXipbd"
+
+# Use your Paybill (shortcode) & passkey from Safaricom
+BUSINESS_SHORTCODE = "222111"  # test shortcode for sandbox
+PASSKEY = "BCxI7C2O1UMPZY2SjxfU1PyByRjOk7PU9Fetig7AM42T/DW2/48cDr2AwSMmQB8kFh1wwFbQOXweAEnlOkgCJMG5yKJ3qzIyBSFmMROoOT8bjwgKwjDe3BqKhTaxxZQjie1uO00elV1E5cRffAUTzqfmKvPYN6RfoO4D6/hzxo/K67otwL/uwEVTEllu0XQgX/osZK5qPvweoiM+TaQ9FQIFSSN5wrQo9Chw0F8++rPigHGAXANFPMzeIAdO+bjZ5DPzcra0U378ppGLzAIcpcLlnEl7tyGQjIEQsmwRr6Th2blGEzPETfsEl7wh6lK/++ZXGwT0e1LMGQuvqTGp+g=="
+
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
@@ -31,20 +41,119 @@ mail = Mail(app)
 
 bcrypt = Bcrypt(app)
 
-# def init_db():
-#     cur = conn.cursor()
-#     cur.execute("""
-#         CREATE TABLE IF NOT EXISTS blogs (
-#             blog_id SERIAL PRIMARY KEY,
-#             title TEXT NOT NULL,
-#             content TEXT NOT NULL,
-#             published_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-#         )
-#     """)
-#     conn.commit()
-#     cur.close()
+def init_db():
+    cur = conn.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS blogs (
+            blog_id SERIAL PRIMARY KEY,
+            title TEXT NOT NULL,
+            content TEXT NOT NULL,
+            published_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    conn.commit()
+    cur.close()
 
-# init_db()
+init_db()
+
+def get_access_token():
+    url = "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
+    response = requests.get(url, auth=HTTPBasicAuth(CONSUMER_KEY, CONSUMER_SECRET))
+    return response.json()['access_token']
+
+def stk_push(phone, amount):
+    access_token = get_access_token()
+    url = "https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
+    
+    timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+    password = base64.b64encode((BUSINESS_SHORTCODE + PASSKEY + timestamp).encode()).decode('utf-8')
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+    payload = {
+        "BusinessShortCode": BUSINESS_SHORTCODE,
+        "Password": password,
+        "Timestamp": timestamp,
+        "TransactionType": "CustomerPayBillOnline",
+        "Amount": amount,
+        "PartyA": phone,
+        "PartyB": BUSINESS_SHORTCODE,
+        "PhoneNumber": phone,
+        "CallBackURL": "https://abc123.ngrok.io/callback",
+        "AccountReference": "CharityDonation",
+        "TransactionDesc": "Donation"
+    }
+
+    response = requests.post(url, json=payload, headers=headers)
+    return response.json()
+
+@app.route("/callback", methods=["POST"])
+def callback():
+    data = request.get_json()
+    print("M-Pesa Callback:", data)
+    # TODO: save donation status in DB
+    return jsonify({"ResultCode": 0, "ResultDesc": "Accepted"})
+
+# # --- GET ACCESS TOKEN ---
+# def get_access_token():
+#     url = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"  
+#     # ↑ Use sandbox for testing, change to api.safaricom.co.ke when live
+
+#     print("🔑 Requesting Access Token...")
+#     response = requests.get(url, auth=HTTPBasicAuth(CONSUMER_KEY, CONSUMER_SECRET))
+
+#     print("🔎 Response Status Code:", response.status_code)
+#     print("🔎 Raw Response:", response.text)
+
+#     try:
+#         data = response.json()
+#         access_token = data.get("access_token")
+#         if not access_token:
+#             raise Exception("No access_token in response")
+#         print("✅ Access Token Retrieved:", access_token)
+#         return access_token
+#     except Exception as e:
+#         print("❌ Error parsing access token:", e)
+#         raise
+
+# # --- STK PUSH ---
+# def stk_push(phone, amount):
+#     access_token = get_access_token()
+#     url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"  
+
+#     timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+#     password = base64.b64encode((BUSINESS_SHORTCODE + PASSKEY + timestamp).encode()).decode('utf-8')
+
+#     headers = {
+#         "Authorization": f"Bearer {access_token}",
+#         "Content-Type": "application/json"
+#     }
+
+#     payload = {
+#         "BusinessShortCode": BUSINESS_SHORTCODE,
+#         "Password": password,
+#         "Timestamp": timestamp,
+#         "TransactionType": "CustomerPayBillOnline",
+#         "Amount": amount,
+#         "PartyA": phone,  # phone number to be charged
+#         "PartyB": BUSINESS_SHORTCODE,
+#         "PhoneNumber": phone,
+#         "CallBackURL": "https://your-ngrok-url/callback",  # replace with real URL
+#         "AccountReference": "CharityDonation",
+#         "TransactionDesc": "Donation"
+#     }
+
+#     print("📤 Sending STK Push Payload:", payload)
+
+#     response = requests.post(url, json=payload, headers=headers)
+
+#     print("🔎 STK Push Status Code:", response.status_code)
+#     print("🔎 STK Push Response:", response.text)
+
+#     try:
+#         return response.json()
+#     except Exception as e:
+#         print("❌ Error parsing STK Push response:", e)
+#         raise
 
 
 @app.route('/')
@@ -52,11 +161,11 @@ def home():
     cur = conn.cursor()
 
     # Fetch 3 latest blogs
-    # cur.execute("""
-    #     SELECT blog_id, title, content, TO_CHAR(published_at, 'Month DD, YYYY') 
-    #     FROM blogs ORDER BY published_at DESC LIMIT 3
-    # """)
-    # recent_blogs = cur.fetchall()
+    cur.execute("""
+        SELECT blog_id, title, content, TO_CHAR(published_at, 'Month DD, YYYY') 
+        FROM blogs ORDER BY published_at DESC LIMIT 3
+    """)
+    recent_blogs = cur.fetchall()
 
     # Fetch 3 upcoming or latest events
     cur.execute("""
@@ -532,9 +641,27 @@ def admin_exists():
 
 # DONATE PAGE
 
-@app.route('/donate')
+# @app.route('/donate')
+# def donate():
+#     return render_template('donate.html')
+
+@app.route("/donate", methods=["GET", "POST"])
 def donate():
-    return render_template('donate.html')
+    if request.method == "POST":
+        phone = request.form["phone"]
+        amount = request.form["amount"]
+
+        result = stk_push(phone, amount)
+
+        if result.get("ResponseCode") == "0":
+            flash("Payment request sent to your phone. Please complete it.", "success")
+        else:
+            flash("Payment request failed. Try again.", "danger")
+
+        return redirect(url_for("donate"))
+
+    return render_template("donate.html")
+
 
 # @app.route('/donate/mpesa', methods=['POST'])
 # def donate_mpesa():

@@ -99,15 +99,18 @@ def fetch_contact():
 # inserting data
 def insert_users(values):
     insert = "insert into users(name,email,password,role,status)values(%s,%s,%s,%s,%s)"
-    cur.execute(insert,values)
+    with conn.cursor() as cur:
+        cur.execute(insert,values)
     conn.commit()
-    cur.close()
+    
 
 def insert_campaigns(values):
     insert = "insert into campaigns(title,description,goal_amount,start_date,end_date)values(%s,%s,%s,%s,%s)"
     cur.execute(insert,values)
     conn.commit()
     cur.close()
+
+   
 
 def insert_donations(values):
     insert = "insert into donations(user_id,campaign_id,amount)values(%s,%s,%s)"
@@ -151,10 +154,17 @@ def insert_contact(values):
     conn.commit()
     cur.close()
 
+# def check_user(email):
+#     query="select * from users where email = %s"
+#     cur.execute(query,(email,))
+#     user=cur.fetchone()
+#     cur.close()
+#     return user
+
 def check_user(email):
-    query="select * from users where email = %s"
-    cur.execute(query,(email,))
-    user=cur.fetchone()
-    cur.close()
+    query = "select * from users where email = %s"
+    with conn.cursor() as cur:
+        cur.execute(query, (email,))
+        user = cur.fetchone()
     return user
 
