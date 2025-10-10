@@ -9,19 +9,19 @@
     <form method="POST">
       <div class="mb-3">
         <label class="form-label">Title</label>
-        <input type="text" name="title" class="form-control" value="{{ event[1] }}" required>
+        <input type="text" name="title" class="form-control" value="{{ event[0] }}" required>
       </div>
       <div class="mb-3">
         <label class="form-label">Content</label>
-        <textarea name="desc" rows="6" class="form-control" required>{{ event[2] }}</textarea>
+        <textarea name="desc" rows="6" class="form-control" required>{{ event[1] }}</textarea>
       </div>
       <div class="mb-3">
-        <label class="form-label">Event date</label>
-        <textarea name="edate" rows="6" class="form-control" required>{{ event[3] }}</textarea>
+        <label class="form-label">Date</label>
+        <input type="date" name="edate" class="form-control" value="{{ event[2] }}" required>
       </div>
       <div class="mb-3">
         <label class="form-label">Location</label>
-        <textarea name="location" rows="6" class="form-control" required>{{ event[4] }}</textarea>
+        <input type="text" name="location" class="form-control" value="{{ event[3] }}" required>
       </div>
       <button type="submit" class="btn btn-primary">Update Event</button>
       <a href="/events" class="btn btn-secondary">Cancel</a>

@@ -526,7 +526,7 @@ def edit_event(event_id):
         event_date = request.form['edate']
         location = request.form['location']
         cur.execute("UPDATE events SET title=%s, description=%s, event_date=%s, location=%s WHERE event_id=%s",
-                    (title, description, event_date, location))
+                    (title, description, event_date, location, event_id))
         conn.commit()
         cur.close()
         flash("Event updated successfully", "success")
@@ -554,7 +554,7 @@ def edit_campaign(campaign_id):
         flash("Campaign updated successfully", "success")
         return redirect(url_for('campaigns'))
     
-    cur.execute("SELECT title, description, goal_amount, start_date, end_date FROM campaigns WHERE campaign_id=%s", (campaign_id))
+    cur.execute("SELECT title, description, goal_amount, start_date, end_date FROM campaigns WHERE campaign_id=%s", (campaign_id,))
     campaign = cur.fetchone()
     cur.close()
     return render_template('edit_campaign.html', campaign = campaign, campaign_id = campaign_id)

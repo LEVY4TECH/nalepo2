@@ -13,7 +13,19 @@
       </div>
       <div class="mb-3">
         <label class="form-label">Content</label>
-        <textarea name="content" rows="6" class="form-control" required>{{ campaign[1] }}</textarea>
+        <textarea name="desc" rows="6" class="form-control" required>{{ campaign[1] }}</textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Goal Amount</label>
+        <input type="text" name="goal" class="form-control" value="{{ campaign[2] }}" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Start Date</label>
+        <input type="text" name="start" class="form-control" value="{{ campaign[3] }}" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">End Date</label>
+        <input type="text" name="end" class="form-control" value="{{ campaign[4] }}" required>
       </div>
       <button type="submit" class="btn btn-primary">Update Event</button>
       <a href="/campaigns" class="btn btn-secondary">Cancel</a>
