@@ -548,7 +548,7 @@ def edit_campaign(campaign_id):
         start_date = request.form['start']
         end_date = request.form['end']
         cur.execute("UPDATE campaigns SET title=%s, description=%s, goal_amount=%s, start_date=%s, end_date=%s WHERE campaign_id=%s",
-                    (title, description, campaign_id, goal_amount, start_date, end_date))
+                    (title, description, goal_amount, start_date, end_date, campaign_id))
         conn.commit()
         cur.close()
         flash("Campaign updated successfully", "success")
@@ -691,12 +691,60 @@ def donate():
 #     timestamp = datetime.now()
 #     times = Timestamp.strftime("%Y%m%d%H%M%S")
 
+@app.route('/subscribe', methods=['POST'])
+def subscribe():
+    email = request.form.get('email')
+
+    if not email:
+        flash("Please enter a valid email address.", "danger")
+        return redirect(url_for('contact'))
+
+    msg = Message(
+        subject="Welcome to Nalepo Organization ",
+        recipients=[email]
+    )
+
+    msg.body = f"""
+Hello,
+
+Thank you for joining the Nalepo Organization mailing list.
+
+You are now part of our community and will start receiving
+newsletters, updates, and important announcements from us.
+
+We’re glad to have you with us.
+
+Warm regards,
+Nalepo Organization
+"""
+
+    mail.send(msg)
+
+    flash("You have successfully joined our mailing list!", "success")
+    return redirect(url_for('contact'))
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'levy4star@gmail.com'
+app.config['MAIL_PASSWORD'] = 'znve iqmn dtln arto'
+app.config['MAIL_DEFAULT_SENDER'] = ('Nalepo Organization', 'levy4star@gmail.com')
+
+mail = Mail(app)
 
 
+
+
+
+
+# if __name__ == '__main__':
+#     port = int(os.environ.get("PORT", 5000))
+#     app.run(host='0.0.0.0', port=port)
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=port, debug=True)
+
 
 
 # app.run(debug=True)

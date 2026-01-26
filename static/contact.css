@@ -1,0 +1,62 @@
+.container1{
+    background-color: rgb(25,135,84);
+    height: 200px;
+    border-radius: 2%;
+    align-content: center;
+    text-align: center;
+    margin: 0 40px;
+    
+}
+
+.para1{
+    font-size: x-small;
+}
+
+.yellowbloc {
+    height: 380px;
+    align-content: center;
+    align-self: center;
+    margin-top: 30px;
+    margin-left: 40px;
+    margin-right: 40px;
+    
+}
+
+.yellowbloc .conte {
+    padding-left: 100px;
+}
+
+
+
+.subscribe-box {
+    border: 2px solid rgb(25,135,84);
+    /* Border color */
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    background-color: white;
+    width: 500px;
+}
+
+.subscribe-box input {
+    border: none;
+    outline: none;
+    background: transparent;
+    flex: 1;
+    padding: 10px;
+}
+
+.subscribe-box button {
+    background-color: rgb(25,135,84);
+    /* Dark red button */
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 20px;
+}
+
+.subscribe-box button:hover {
+    background-color: rgb(25,135,84);
+    /* Darker red on hover */
+}

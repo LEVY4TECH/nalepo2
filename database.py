@@ -107,11 +107,17 @@ def fetch_blogs():
 
 
 
+# def fetch_contact():
+#     cur.execute('select * from contact;')
+#     contact = cur.fetchall()
+#     cur.close()
+#     return contact
+
 def fetch_contact():
-    cur.execute('select * from contact;')
-    contact = cur.fetchall()
-    cur.close()
-    return contact
+    with conn.cursor() as cur:
+        cur.execute('SELECT * FROM contact;')
+        return cur.fetchall()
+
 
 # inserting data
 def insert_users(values):
