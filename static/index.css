@@ -62,3 +62,30 @@
   padding: 30px;
   border-radius: 30px;
 }
+
+.nairobi {
+  margin-top: 50px;
+}
+
+.nairobi img {
+  height: 400px;
+  width: 100%;
+  object-fit: cover;
+}
+
+.counter {
+  font-size: 50px;
+  font-weight: bold;
+  color: black;
+  opacity: 0;
+  /* Initially hidden */
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+/* .contnai {
+  padding-top: 50px;
+} */
+.show {
+  opacity: 1;
+  transform: translateY(0);
+}

@@ -184,11 +184,19 @@ def insert_event_registration(values):
     conn.commit()
     cur.close()
 
+# def insert_blogs(values):
+#     insert = "insert into blogs(user_id,title,content)values(%s,%s,%s)"
+#     cur.execute(insert,values)
+#     conn.commit()
+#     cur.close()
+
 def insert_blogs(values):
-    insert = "insert into blogs(user_id,title,content)values(%s,%s,%s)"
-    cur.execute(insert,values)
-    conn.commit()
-    cur.close()
+    insert = "INSERT INTO blogs (user_id, title, content) VALUES (%s, %s, %s)"
+
+    with conn.cursor() as cur:
+        cur.execute(insert, values)
+        conn.commit()
+
 
 def insert_contact(values):
     insert = "insert into contact(name,email,message)values(%s,%s,%s)"

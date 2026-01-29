@@ -185,7 +185,7 @@ def home():
 
     return render_template(
         'index.html',
-        # blogs=recent_blogs,
+        blogs=recent_blogs,
         events=recent_events,
         campaigns=recent_campaigns
     )
