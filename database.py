@@ -41,12 +41,17 @@ cur = conn.cursor()
 #         )
 
 
-# fetching data
+# # fetching data
+# def fetch_users():
+#     cur.execute('select * from users;')
+#     users = cur.fetchall()
+#     cur.close()
+#     return users
+
 def fetch_users():
-    cur.execute('select * from users;')
-    users = cur.fetchall()
-    cur.close()
-    return users
+    with conn.cursor() as cur:
+        cur.execute('SELECT * FROM users;')
+        return cur.fetchall()
 
 def fetch_campaigns():
     cur = conn.cursor()
@@ -71,11 +76,16 @@ def fetch_payments():
     cur.close()
     return payments
 
+# def fetch_volunteers():
+#     cur.execute('select * from volunteers;')
+#     volunteers = cur.fetchall()
+#     cur.close()
+#     return volunteers
+
 def fetch_volunteers():
-    cur.execute('select * from volunteers;')
-    volunteers = cur.fetchall()
-    cur.close()
-    return volunteers
+    with conn.cursor() as cur:
+        cur.execute('SELECT * FROM volunteers;')
+        return cur.fetchall()
 
 def fetch_events():
     cur = conn.cursor()

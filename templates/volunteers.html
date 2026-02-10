@@ -1,0 +1,133 @@
+
+
+{% extends "base.html" %}
+{% block title %} Volunteers Page {% endblock%}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='volunteers.css') }}">
+{% endblock %}
+
+
+{% block content %}
+
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-3">Lend a Hand, Change a Life</h1>
+        <p class="lead mb-5 opacity-75">Join our dedicated team of volunteers in Kenya. Your skills can build a better tomorrow.</p>
+
+        <!-- Check if user is logged in using session -->
+        {% if session.get('user_id') %}
+        <!-- Open Modal -->
+        <button type="button" class="btn btn-volunteer-main" data-bs-toggle="modal" data-bs-target="#volunteerModal">
+            Be a Volunteer
+        </button>
+        {% else %}
+        <!-- Redirect to Register -->
+        <a href="{{ url_for('register') }}" class="btn btn-volunteer-main">
+            Be a Volunteer
+        </a>
+        <p class="mt-3 small text-white-50">Please register or login to apply.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Why Volunteer Section -->
+<div class="container my-5 py-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">Our Impact Pillars</h2>
+        <div class="mx-auto bg-dark" style="height: 2px; width: 50px; margin-top: 10px;"></div>
+    </div>
+    <div class="row g-4 text-center">
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm p-4">
+                <div class="feature-icon"><i class="fas fa-heart fa-2x"></i></div>
+                <h5>Community Care</h5>
+                <p class="text-muted small">Support local families with basic needs and care.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm p-4">
+                <div class="feature-icon"><i class="fas fa-book-reader fa-2x"></i></div>
+                <h5>Education</h5>
+                <p class="text-muted small">Share your knowledge and skills with the youth.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm p-4">
+                <div class="feature-icon"><i class="fas fa-medkit fa-2x"></i></div>
+                <h5>Health & Hygiene</h5>
+                <p class="text-muted small">Participate in medical camps and clean-up drives.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- VOLUNTEER MODAL FORM -->
+<div class="modal fade" id="volunteerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title">Volunteer Application</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <!-- Flask Form Submission -->
+                <form action="{{ url_for('submit_volunteer') }}" method="POST">
+
+                    <div class="row g-3">
+                        <!-- Full Name -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Full Name</label>
+                            <input type="text" class="form-control" name="full_name" required>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Email Address</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+
+                        <!-- Phone Number (Kenyan Format) -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Phone Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light fw-bold">+254</span>
+                                <input type="text" class="form-control" name="phone_digits" placeholder="712345678"
+                                    pattern="[0-9]{9}" title="Enter 9 digits (e.g. 712345678)" required>
+                            </div>
+                            <div class="form-text">Do not include the leading zero.</div>
+                        </div>
+
+                        <!-- Availability -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Preferred Duration</label>
+                            <select class="form-select" name="period" required>
+                                <option value="" selected disabled>Select...</option>
+                                <option value="Short Term (1-2 Weeks)">Short Term (1-2 Weeks)</option>
+                                <option value="1 Month">1 Month</option>
+                                <option value="3 Months">3 Months</option>
+                                <option value="Long Term (6+ Months)">Long Term (6+ Months)</option>
+                            </select>
+                        </div>
+
+                        <!-- Skills -->
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Skills & Motivation</label>
+                            <textarea class="form-control" name="skills" rows="3"
+                                placeholder="Tell us about your skills and why you want to join..." required></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer px-0 pb-0 mt-4 border-0">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success px-4">Submit Application</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

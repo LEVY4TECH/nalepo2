@@ -262,16 +262,201 @@ def volunteers():
     users = fetch_users()
     return render_template('volunteers.html',volunteers = volunteers, users = users)
 
-@app.route('/add_volunteer', methods = ['GET','POST'])
+# @app.route('/add_volunteer', methods = ['GET','POST'])
+# def add_volunteer():
+#     if request.method == 'POST':
+#         user_id = request.form['uid']
+#         skills = request.form['skills']
+#         availability = request.form['avail']
+#         new_volunteer = (user_id,skills,availability)
+#         insert_volunteers(new_volunteer)
+#         flash("Volunteer added successfully","success")
+#         return redirect(url_for('volunteers'))
+    
+@app.route('/add_volunteer', methods=['POST'])
 def add_volunteer():
-    if request.method == 'POST':
-        user_id = request.form['uid']
-        skills = request.form['skills']
-        availability = request.form['avail']
-        new_volunteer = (user_id,skills,availability)
-        insert_volunteers(new_volunteer)
-        flash("Volunteer added successfully","success")
+    email = request.form['email']
+    skills = request.form['skills']
+    availability = request.form['avail']
+
+    # Check if user exists
+    cur = conn.cursor()
+    cur.execute("SELECT user_id FROM users WHERE email = %s", (email,))
+    user = cur.fetchone()
+
+    if not user:
+        flash("Please register first to become a volunteer.", "warning")
+        return redirect(url_for('register'))
+
+    user_id = user[0]
+
+    # Insert volunteer request as pending
+    cur.execute("""
+        INSERT INTO volunteers (user_id, skills, availability, status)
+        VALUES (%s, %s, %s, 'pending')
+    """, (user_id, skills, availability))
+
+    conn.commit()
+    cur.close()
+
+    flash("Details sent successfully. Please wait for approval.", "info")
+    return redirect(url_for('volunteers'))
+
+# submit volunteer
+
+# @app.route('/submit_volunteer', methods=['POST'])
+# def submit_volunteer():
+#     # Grab form data from modal
+#     full_name = request.form['full_name']
+#     email = request.form['email']
+#     phone_digits = request.form['phone_digits']
+#     period = request.form['period']
+#     skills = request.form['skills']
+
+#     cur = conn.cursor()
+    
+#     # Check if user exists in users table
+#     cur.execute("SELECT user_id FROM users WHERE email = %s", (email,))
+#     user = cur.fetchone()
+
+#     if not user:
+#         flash("Please register first to become a volunteer.", "warning")
+#         cur.close()
+#         return redirect(url_for('register'))
+
+#     user_id = user[0]
+
+#     # Insert volunteer request as pending
+#     cur.execute("""
+#         INSERT INTO volunteers (user_id, full_name, email, phone_digits, period, skills, status, date_applied)
+#         VALUES (%s, %s, %s, %s, %s, %s, 'Pending', NOW())
+#     """, (user_id, full_name, email, phone_digits, period, skills))
+
+#     conn.commit()
+#     cur.close()
+
+#     flash("Volunteer application submitted successfully. Please wait for approval.", "success")
+#     return redirect(url_for('volunteers'))
+
+
+@app.route('/submit_volunteer', methods=['POST'])
+def submit_volunteer():
+    email = request.form['email']
+    full_name = request.form['full_name']
+    phone_digits = request.form['phone_digits']
+    period = request.form['period']
+    skills = request.form['skills']
+
+    try:
+        with conn.cursor() as cur:
+            # Check if user exists
+            cur.execute("SELECT user_id FROM users WHERE email = %s", (email,))
+            user = cur.fetchone()
+            if not user:
+                flash("Please register first to become a volunteer.", "warning")
+                return redirect(url_for('register'))
+
+            user_id = user[0]
+
+            # Insert volunteer request
+            cur.execute("""
+                INSERT INTO volunteers (user_id, full_name, email, phone_digits, period, skills)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """, (user_id, full_name, email, phone_digits, period, skills))
+
+            conn.commit()
+
+        flash("Details sent successfully. Please wait for approval.", "info")
         return redirect(url_for('volunteers'))
+
+    except Exception as e:
+        conn.rollback()  # rollback any partial transaction
+        flash(f"Error submitting volunteer: {str(e)}", "danger")
+        return redirect(url_for('volunteers'))
+
+# approving volunteer
+
+@app.route('/approve_volunteer/<int:volunteer_id>')
+def approve_volunteer(volunteer_id):
+    if session.get('role') != 'admin':
+        flash("Unauthorized access", "danger")
+        return redirect(url_for('home'))
+
+    cur = conn.cursor()
+    # Use id instead of volunteer_id
+    cur.execute("""
+        UPDATE volunteers
+        SET status = 'Approved'
+        WHERE id = %s
+        RETURNING user_id
+    """, (volunteer_id,))
+    result = cur.fetchone()
+
+    if result:
+        cur.execute("SELECT email, name FROM users WHERE user_id = %s", (result[0],))
+        user = cur.fetchone()
+
+        msg = Message(
+            "Volunteer Application Approved",
+            recipients=[user[0]]
+        )
+        msg.body = f"""
+Hello {user[1]},
+
+Congratulations! Your volunteer application has been approved.
+We’ll reach out with further instructions.
+
+Regards,
+Nalepo Organization
+"""
+        mail.send(msg)
+
+    conn.commit()
+    cur.close()
+
+    flash("Volunteer approved and notified via email.", "success")
+    return redirect(url_for('manage_volunteers'))
+
+# rejecting volunteer
+@app.route('/reject_volunteer/<int:volunteer_id>')
+def reject_volunteer(volunteer_id):
+    if session.get('role') != 'admin':
+        flash("Unauthorized access", "danger")
+        return redirect(url_for('home'))
+
+    cur = conn.cursor()
+    # Use id instead of volunteer_id
+    cur.execute("""
+        SELECT u.email, v.full_name
+        FROM volunteers v
+        JOIN users u ON v.user_id = u.user_id
+        WHERE v.id = %s
+    """, (volunteer_id,))
+    user = cur.fetchone()
+
+    # Use id instead of volunteer_id for deletion
+    cur.execute("DELETE FROM volunteers WHERE id = %s", (volunteer_id,))
+    conn.commit()
+    cur.close()
+
+    if user:
+        msg = Message(
+            "Volunteer Application Update",
+            recipients=[user[0]]
+        )
+        msg.body = f"""
+Hello {user[1]},
+
+Thank you for your interest in volunteering with Nalepo.
+Unfortunately, your application was not approved at this time.
+
+Regards,
+Nalepo Organization
+"""
+        mail.send(msg)
+
+    flash("Volunteer rejected and notified.", "info")
+    return redirect(url_for('manage_volunteers'))
 
 @app.route('/events')
 def events():
@@ -576,6 +761,40 @@ def manage_users():
     users = cur.fetchall()
     cur.close()
     return render_template('manage_users.html', users=users)
+
+
+@app.route('/manage_volunteers')
+def manage_volunteers():
+    if session.get('role') != 'admin':
+        flash("Unauthorized access", "danger")
+        return redirect(url_for('home'))
+
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT id, full_name, email, phone_digits, period, skills, status, date_applied
+        FROM volunteers
+        WHERE status = 'Pending'
+        ORDER BY date_applied DESC
+    """)
+    applications = cur.fetchall()
+    cur.close()
+
+    return render_template('manage_volunteers.html', applications=applications)
+
+# @app.route('/manage_volunteers')
+# def manage_volunteers():
+#     # Check if user is admin
+#     if session.get('role') != 'admin':
+#         flash('Access Denied. Admin privileges required.', 'danger')
+#         return redirect(url_for('home'))
+    
+#     cur = conn.cursor()
+        
+#     # Fetch all applications, newest first
+#     cur.execute("SELECT volunteer_id, name.")
+    
+    
+#     return render_template('admin/manage_volunteers.html', applications=applications)
 
 
 

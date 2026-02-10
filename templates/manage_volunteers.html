@@ -1,0 +1,94 @@
+
+{% extends "base.html" %}
+{% block title %} Manage_volunteers {% endblock%}
+
+
+{% block content %}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Main Content Area -->
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="text-secondary"><i class="fas fa-users-cog"></i> Manage Volunteers</h3>
+                <!-- Export button example (optional) -->
+                <button class="btn btn-outline-success btn-sm"><i class="fas fa-file-excel"></i> Export CSV</button>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0 text-muted">Application Requests</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Applicant</th>
+                                <!-- <th>Contact Info</th> -->
+                                <th>Period</th>
+                                <th>Skills</th>
+                                <th>Date Applied</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for app in applications %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-secondary text-white rounded-circle d-flex justify-content-center align-items-center me-3"
+                                            style="width: 40px; height: 40px;">
+                                            {{ app[1][0] if app[1] else '?' }} <!-- first letter of full_name -->
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">{{ app[1] }}</div> <!-- full_name -->
+                                            <div class="small text-muted">User ID: {{ app[0] }}</div> <!-- id -->
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-info text-dark">{{ app[4] }}</span></td> <!-- period -->
+                                <td style="max-width: 200px;">
+                                    <small class="text-muted text-truncate d-block">{{ app[5] }}</small> <!-- skills -->
+                                </td>
+                                <td>{{ app[7].strftime('%Y-%m-%d') }}</td> <!-- date_applied -->
+                                <td>
+                                    {% if app[6] == 'Pending' %}
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                    {% elif app[6] == 'Approved' %}
+                                    <span class="badge bg-success">Approved</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Rejected</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{{ url_for('approve_volunteer', volunteer_id=app[0]) }}"
+                                           class="btn btn-sm btn-outline-success" title="Approve">
+                                           <i class="fas fa-check"></i>
+                                        </a>
+                                        <a href="{{ url_for('reject_volunteer', volunteer_id=app[0]) }}"
+                                           class="btn btn-sm btn-outline-danger" title="Reject">
+                                           <i class="fas fa-times"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    No volunteer applications found.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block footer %}{% endblock %}
