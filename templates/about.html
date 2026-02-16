@@ -1,204 +1,105 @@
 {% extends "base.html" %}
-{% block title %} About Page {% endblock%}
+{% block title %} About Page {% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='about.css') }}">
+<!-- AOS Animation Library -->
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
 {% endblock %}
-
 
 {% block content %}
 
-<div class="container1 ">
-  <p class="fs-4 container fw-bold">We are a community-driven organization dedicated to bringing hope, resources, and
-    sustainable change to those in
-    need—one life, one project, one act of kindness at a time.
-  </p>
-</div>
+<!-- HERO / INTRO SECTION -->
+<section class="hero">
+  <div class="hero-text">
+    <p class="fs-4 fw-bold">
+      We are a community-driven organization dedicated to bringing hope, resources, and sustainable change to those in need—one life, one project, one act of kindness at a time.
+    </p>
+  </div>
+</section>
 
-<div id="about" class="container2 container">
-  <p class="fw-bold fs-5 head">About Us</p>
-  <hr>
-  <p>Established in 2023, Nalepo is a nonprofit organization dedicated to driving sustainable,
-    community-centered impact. We work with integrity and purpose to address systemic challenges in underserved
-    regions through strategic, high-impact programs. Guided by values such as honesty, accountability, transparency,
-    and inclusivity, our team is committed to delivering meaningful change and fostering resilience across
-    generations.
+<!-- ABOUT US SECTION -->
+<section id="about" class="about-section container">
+  <h2 class="section-title" data-aos="fade-up">About Us</h2>
+  <p data-aos="fade-up" data-aos-delay="100">
+    Established in 2023, Nalepo is a nonprofit organization dedicated to driving sustainable, community-centered impact. We work with integrity and purpose to address systemic challenges in underserved regions through strategic, high-impact programs. Guided by values such as honesty, accountability, transparency, and inclusivity, our team is committed to delivering meaningful change and fostering resilience across generations.
   </p>
-  <ul>
-    <h5>Our Main focus:</h5>
-    <li> Alleviating hunger through the support and development of sustainable agricultural systems</li>
+  <h5 data-aos="fade-up" data-aos-delay="200">Our Main Focus:</h5>
+  <ul data-aos="fade-up" data-aos-delay="300">
+    <li>Alleviating hunger through sustainable agricultural systems</li>
     <li>Educational empowerment for marginalized communities</li>
     <li>Sensitization and advocacy on key healthcare issues</li>
     <li>Youth enterprise development and economic inclusion</li>
     <li>Promotion of gender equity and equal opportunity</li>
   </ul>
-</div>
+</section>
 
-<div id="team" class="container3">
-  <h2 class="head">Our Team</h2>
-  <!-- <h4>Founder</h4> -->
-  <div class="founder">
-    <div>
-      <img src="/static/founder.jpg" alt="">
-    </div>
-    <div>
-      <p class="" style="font-family: Georgia, 'Times New Roman', Times, serif;">Philip Kanyinke Minis is the visionary
-        behind Nalepo Organisation, a passionate and purpose-driven individual
-        currently pursuing a Bachelor’s degree in Education at the University of Nairobi. His strong sense of
-        responsibility toward social impact and community development led to the establishment of this
-        organization in 2023. As a student leader and changemaker, he demonstrates exceptional commitment to
-        uplifting underserved communities through practical, scalable solutions in agriculture, education,
-        healthcare, youth development, and gender equity. Known for his integrity, resilience, and strategic
-        mindset, Philip continues to balance academic excellence with impactful service, proving that
-        leadership is not defined by age but by action. His work is grounded in compassion and a long-term
-        vision to transform lives and inspire others to do the same.
+<!-- OUR TEAM SECTION -->
+<section id="team" class="team-section container">
+  <h2 class="section-title" data-aos="fade-up">Our Team</h2>
 
-      </p>
-
+  <!-- Founder -->
+  <div class="founder" data-aos="fade-up" data-aos-delay="100">
+    <img src="/static/founder.jpg" alt="Founder Philip">
+    <div class="founder-info">
+      <p>Philip Kanyinke Minis is the visionary behind Nalepo Organisation, a passionate and purpose-driven individual currently pursuing a Bachelor’s degree in Education at the University of Nairobi...</p>
       <p class="fw-bold">Founder, Nalepo Organization</p>
     </div>
   </div>
-  <hr style="margin-top: 50px;">
-  <div class="container py-5">
-    <div class="row justify-content-center g-4">
 
-      <!-- Card 1 -->
-      <div class="col-md-3">
-        <div class="card solution-card text-white">
-          <img src="/static/founder.jpg" class="card-img" alt="Investment">
-          <div class="card-img-overlay d-flex align-items-end">
-            <h5 class="card-title">Philip, Chairperson</h5>
-          </div>
+  <!-- TEAM CARDS GRID -->
+  <div class="row team-cards g-4 mt-5">
+    {% for member in [
+      {'img': 'founder.jpg', 'name': 'Philip', 'role': 'Chairperson'},
+      {'img': 'danson.jpg', 'name': 'Danson', 'role': 'Vice Chairperson'},
+      {'img': 'kaigil1.jpeg', 'name': 'Dickson', 'role': 'Secretary'},
+      {'img': 'esther.jpg', 'name': 'Esther', 'role': 'Coordinator'},
+      {'img': 'nabulu.jpg', 'name': 'James', 'role': 'Treasurer'},
+      {'img': 'kipees.jpg', 'name': 'Kipees', 'role': 'Treasurer'},
+      {'img': 'leshan.jpg', 'name': 'Leshan', 'role': 'Member'},
+      {'img': 'mantaine.jpg', 'name': 'Mantaine', 'role': 'Member'},
+      {'img': 'max1.jpeg', 'name': 'Kuyioni', 'role': 'Member'},
+      {'img': 'founder.jpg', 'name': 'William', 'role': 'Member'},
+      {'img': 'kelvin.jpg', 'name': 'Kelvin', 'role': 'Member'},
+      {'img': 'janet1.jpeg', 'name': 'Janet', 'role': 'Member'}
+    ] %}
+    <div class="col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="150">
+      <div class="card team-card">
+        <img src="/static/{{ member.img }}" class="card-img" alt="{{ member.name }}">
+        <div class="card-overlay">
+          <h5>{{ member.name }}</h5>
+          <p>{{ member.role }}</p>
         </div>
       </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
 
-      <!-- Card 2 -->
-      <div class="col-md-3">
-        <div class="card solution-card text-white">
-          <img src="/static/danson.jpg" class="card-img" alt="Savings">
-          <div class="card-img-overlay d-flex align-items-end">
-            <h5 class="card-title">Danson, Vice Chairperson</h5>
-          </div>
-        </div>
-      </div>
+<hr style="margin-left: 7%; margin-right: 7%;">
 
-      <!-- Card 3 -->
-      <div class="col-md-3">
-        <div class="card solution-card text-white">
-          <img src="/static/kaigil.jpg" class="card-img" alt="Retirement">
-          <div class="card-img-overlay d-flex align-items-end">
-            <h5 class="card-title">Dickson, Secretary</h5>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 3 -->
-      <div class="col-md-3">
-        <div class="card solution-card text-white">
-          <img src="/static/esther.jpg" class="card-img" alt="Retirement">
-          <div class="card-img-overlay d-flex align-items-end">
-            <h5 class="card-title">Esther, Coordinator</h5>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 3 -->
-      <div class="col-md-3">
-        <div class="card solution-card text-white">
-          <img src="/static/nabulu.jpg" class="card-img" alt="Retirement">
-          <div class="card-img-overlay d-flex align-items-end">
-            <h5 class="card-title">James, Treasurer</h5>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 3 -->
-      <div class="col-md-3">
-        <div class="card solution-card text-white">
-          <img src="/static/kipees.jpg" class="card-img" alt="Retirement">
-          <div class="card-img-overlay d-flex align-items-end">
-            <h5 class="card-title">Kipees, Treasurer</h5>
-          </div>
-        </div>
-      </div>
-      <!-- Card 3 -->
-      <div class="col-md-3">
-        <div class="card solution-card text-white">
-          <img src="/static/leshan.jpg" class="card-img" alt="Retirement">
-          <div class="card-img-overlay d-flex align-items-end">
-            <h5 class="card-title">Leshan, Member</h5>
-          </div>
-        </div>
-      </div>
-      <!-- Card 3 -->
-      <div class="col-md-3">
-        <div class="card solution-card text-white">
-          <img src="/static/mantaine.jpg" class="card-img" alt="Retirement">
-          <div class="card-img-overlay d-flex align-items-end">
-            <h5 class="card-title">Mantaine, Member</h5>
-          </div>
-        </div>
-      </div>
-      <!-- Card 3 -->
-      <div class="col-md-3">
-        <div class="card solution-card text-white">
-          <img src="/static/founder.jpg" class="card-img" alt="Retirement">
-          <div class="card-img-overlay d-flex align-items-end">
-            <h5 class="card-title">Kuyioni, Member</h5>
-          </div>
-        </div>
-      </div>
-      <!-- Card 3 -->
-      <div class="col-md-3">
-        <div class="card solution-card text-white">
-          <img src="/static/founder.jpg" class="card-img" alt="Retirement">
-          <div class="card-img-overlay d-flex align-items-end">
-            <h5 class="card-title">William, Member</h5>
-          </div>
-        </div>
-      </div>
-      <!-- Card 3 -->
-      <div class="col-md-3">
-        <div class="card solution-card text-white">
-          <img src="/static/kelvin.jpg" class="card-img" alt="Retirement">
-          <div class="card-img-overlay d-flex align-items-end">
-            <h5 class="card-title">Kelvin, Member</h5>
-          </div>
-        </div>
-      </div>
-      <!-- Card 3 -->
-      <div class="col-md-3">
-        <div class="card solution-card text-white">
-          <img src="/static/founder.jpg" class="card-img" alt="Retirement">
-          <div class="card-img-overlay d-flex align-items-end">
-            <h5 class="card-title">Janet, Member</h5>
-          </div>
-        </div>
-      </div>
-
+<!-- VISION & MISSION SECTION -->
+<section id="vision" class="vision-section container">
+  <div class="vision-cards d-flex flex-wrap justify-content-center gap-4">
+    <div class="vision-card" data-aos="slide-right" data-aos-delay="100">
+      <h4>Vision</h4>
+      <p>A society where women, men, children, and persons with disabilities enjoy equal rights, opportunities, and high quality of life.</p>
+    </div>
+    <div class="vision-card" data-aos="slide-left" data-aos-delay="200">
+      <h4>Mission</h4>
+      <p>To promote, coordinate, monitor, and evaluate gender equality, women's empowerment, social development, care, participation, and protection of children and persons with disability as an integral part of national development.</p>
     </div>
   </div>
+</section>
 
+{% endblock %}
 
-</div>
-
-<hr>
-
-<div id="vision" class="container4">
-  <div class="cards">
-    <div class="card c1" data-aos="slide-right" data-aos-delay="100" data-aos-duration="1000">
-      <p class="fw-bold">Vision</p>
-      <p>A society where women, men , children and persons with disabilities enjoy equal rights, opportunities and
-        high quality of life
-      </p>
-    </div>
-    <div class="card c2" data-aos="slide-left" data-aos-delay="100" data-aos-duration="1000">
-      <p class="fw-bold">Mission</p>
-      <p>To promote, coordinate, monitor and evaluate gender quality, women's empowerment, social development,care,
-        participation and protection of children and persons with disability as an integral part of national development
-      </p>
-    </div>
-  </div>
-</div>
-
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+  AOS.init({
+    once: true,
+    duration: 1000
+  });
+</script>
 {% endblock %}

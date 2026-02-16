@@ -10,7 +10,7 @@
 
 
 <!-- Hero Section -->
-<header class="hero-section d-flex align-items-center justify-content-center text-white text-center">
+<!-- <header class="hero-section d-flex align-items-center justify-content-center text-white text-center">
   <div class="overlay"></div>
   <div class="hero-content">
     <h1 style="font-family: cursive;" class="display-5 fw-bold py-2">Nalepo Organization</h1>
@@ -25,12 +25,32 @@
         data-aos-duration="1000">Volunteer</a>
     </div>
   </div>
+</header> -->
+
+<header class="hero-section">
+  <div class="overlay"></div>
+
+  <div class="hero-content text-center text-white">
+    <h1 class="hero-title">Nalepo Organization</h1>
+
+    <p class="hero-subtitle">
+      Empowering lives and restoring hope through
+      compassion and community-driven action.
+    </p>
+
+    <div class="hero-actions">
+      <a href="/donate" class="btn btn-success fw-semibold">Donate</a>
+      <a href="/volunteers" class="btn btn-outline-light fw-semibold">Volunteer</a>
+    </div>
+  </div>
 </header>
 
 
 
+
+
 <!-- Automated counter; Our Impact -->
-<div class="nairobi position-relative">
+<!-- <div class="nairobi position-relative">
   <img src="/static/image copy.png" alt="">
 
   <div class="contnai position-absolute top-0 start-50 translate-middle-x text-center text-white">
@@ -38,10 +58,10 @@
     <h4>Audience Reached by Our Platform</h4>
   </div>
 
-  <div class="position-absolute top-50 start-50 translate-middle">
+  <div class="position-absolute top-50 start-50 translate-middle"> -->
     <div class="row">
       <!-- card 1 -->
-      <div class="col-md-3">
+      <!-- <div class="col-md-3">
         <div>
 
           <div class="card-body">
@@ -58,9 +78,9 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
       <!-- card 2 -->
-      <div class="col-md-3">
+      <!-- <div class="col-md-3">
         <div>
 
           <div class="card-body">
@@ -77,9 +97,9 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
       <!-- card 3 -->
-      <div class="col-md-3">
+      <!-- <div class="col-md-3">
         <div>
 
           <div class="card-body">
@@ -95,10 +115,10 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
       <!-- card 4 -->
-      <div class="col-md-3">
+      <!-- <div class="col-md-3">
         <div>
 
           <div class="card-body">
@@ -109,15 +129,88 @@
                 <div class="text-center">
                   <div class="counter" data-target="720">0</div>
                   <p class=" text-black mt-2"><strong> Employees</strong></p>
-                </div>
+                </div> -->
 
-              </div>
-            </div>
-          </div>
+    <!-- </div>
+  </div>
+</div>
+</div>
+</div>
+</div>
+</div> -->
+
+<!-- <script>
+    function animateCounter(counter, speed = 50) {
+      const target = +counter.getAttribute("data-target");
+      let count = 0;
+      const increment = target / speed;
+
+      function updateCounter() {
+        count += increment;
+        if (count < target) {
+          counter.innerText = Math.ceil(count);
+          requestAnimationFrame(updateCounter);
+        } else {
+          counter.innerText = target;
+        }
+      }
+
+      updateCounter();
+    }
+
+    function startCounting(entries, observer) {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const counter = entry.target;
+          counter.classList.add("show");
+          animateCounter(counter, 100);
+          observer.unobserve(counter);
+        }
+      });
+    }
+
+    const observer = new IntersectionObserver(startCounting, { threshold: 0.5 });
+    const counters = document.querySelectorAll(".counter");
+
+    counters.forEach(counter => observer.observe(counter)); 
+  </script> -->
+<!-- </div> -->
+
+<!-- new Automated counter -->
+
+<div>
+  <section class="impact-section">
+    <img src="/static/image copy.png" alt="Impact background">
+
+    <div class="impact-overlay">
+      <div class="impact-header text-center text-white">
+        <h1>Our Impact</h1>
+        <p>Audience reached through our platform</p>
+      </div>
+
+      <div class="impact-counters">
+        <div class="impact-item">
+          <div class="counter" data-target="5000">0</div>
+          <p>Children helped</p>
+        </div>
+
+        <div class="impact-item">
+          <div class="counter" data-target="115">0</div>
+          <p>Global organizations reached</p>
+        </div>
+
+        <div class="impact-item">
+          <div class="counter" data-target="1665">0</div>
+          <p>Partnerships</p>
+        </div>
+
+        <div class="impact-item">
+          <div class="counter" data-target="720">0</div>
+          <p>Employees</p>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 
   <script>
     function animateCounter(counter, speed = 50) {

@@ -5,33 +5,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %} {% endblock %}</title>
+
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
         integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <!-- AOS CSS -->
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+    <!-- Main CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
 
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
     {% block extra_css %}{% endblock %}
 
     <style>
+        /* ================= Navbar & Dropdown ================= */
         .hover-link {
             position: relative;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
         }
 
         .hover-link::after {
             content: "";
             position: absolute;
-            width: 0%;
+            width: 0;
             height: 2px;
-            bottom: -4px;
+            bottom: 0;
             left: 0;
             background-color: #198754;
-            /* Bootstrap success color */
             transition: width 0.3s;
         }
 
@@ -39,69 +48,95 @@
             width: 100%;
         }
 
-        .hover-link:hover {
-            font-weight: 600;
-        }
-
-
-        /* Hover dropdown on navbar */
-        .navbar-nav .hover-link:hover>.dropdown-menu {
+        .navbar-nav .dropdown:hover>.dropdown-menu {
             display: block;
-            margin-top: 0px;
-            /* optional for smooth hover */
         }
 
-        .hover-link {
+        .main-navbar .nav-link {
+            font-weight: 500;
+            padding: 0.5rem 0.8rem;
+        }
+
+        .main-navbar .dropdown-menu {
             transition: all 0.3s ease;
         }
 
-        /* Remove Bootstrap's default dropdown arrow */
-        .navbar .dropdown-toggle::after {
-            display: none !important;
+        .top-navbar {
+            font-size: 0.85rem;
         }
 
-        /* Make dropdown show on hover */
-        .navbar-nav .dropdown:hover .dropdown-menu {
-            display: block;
-            margin-top: 0;
-            /* optional - aligns better */
+        .admin-navbar {
+            background-color: #2f4f4f;
         }
 
-        /* Optional smooth appearance */
-        .dropdown-menu {
-            transition: all 0.3s ease;
+        .admin-navbar .nav-link {
+            padding: 0.4rem 0.8rem;
         }
 
-
-
-        /* .hover-link:hover { */
-        /* font-weight: bold;
-            border-bottom: 2px solid #198754;
-            Bootstrap success color */
-        /* } */
-
-        .nav2 {
-            background-color: rgb(255, 248, 230);
-            /* backdrop-filter: blur(10px);
-            background-color: rgba(0, 0, 0, 0.4); semi-transparent dark */
-            /* margin-top: 45px; */
+        .navbar-brand {
+            font-size: 1.5rem;
+            color: #198754 !important;
         }
 
+        /* ================= Sticky + Transparent Navbar ================= */
+        .main-navbar.sticky-top {
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            transition: background-color 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .main-navbar.transparent {
+            background-color: rgba(255, 255, 255, 0);
+            box-shadow: none;
+        }
+
+        .main-navbar.solid {
+            background-color: #ffffff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ================= Footer ================= */
         .footer {
-            background-color: rgb(231, 231, 231);
+            background-color: #f8f9fa;
+            color: #343a40;
+            padding: 60px 0 20px;
+            font-size: 0.95rem;
+        }
+
+        .footer h3 {
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #198754;
         }
 
         .footer a {
             text-decoration: none;
-            color: black;
+            color: #343a40;
+            transition: color 0.3s;
         }
 
-        .footer h3 {
-            color: black;
+        .footer a:hover {
+            color: #198754;
         }
-        .icons a {
-            margin: 20px;
-            /* margin-top: 20px; */
+
+        .footer .social-icons a {
+            margin-right: 15px;
+            font-size: 1.2rem;
+            color: #343a40;
+        }
+
+        .footer .social-icons a:hover {
+            color: #198754;
+        }
+
+        .footer .footer-bottom {
+            border-top: 1px solid #dee2e6;
+            margin-top: 40px;
+            padding-top: 15px;
+            font-size: 0.85rem;
+            text-align: center;
+            color: #6c757d;
         }
     </style>
 </head>
@@ -125,14 +160,12 @@
     {% endif %}
     {% endwith %}
 
-
-    <!-- === First Navbar (Visible to All: Language, Location, Socials, Auth Links) === -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-2">
-        <div class="container-fluid">
-            <div class="d-flex align-items-center me-auto">
-                <div class="dropdown me-3">
-                    <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button"
-                        data-bs-toggle="dropdown">
+    <!-- === Top Info Navbar === -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-1 top-navbar">
+        <div class="container-fluid justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
                         Language
                     </button>
                     <ul class="dropdown-menu">
@@ -140,16 +173,16 @@
                         <li><a class="dropdown-item" href="#">Swahili</a></li>
                     </ul>
                 </div>
-                <div class="me-3 text-white small">Location: Kenya</div>
+                <span class="text-white">Location: Kenya</span>
             </div>
 
-            <div class="d-flex align-items-center">
-                <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
-                <a href="#" class="text-white me-3"><i class="fab fa-linkedin"></i></a>
-                <a href="#" class="text-white me-3"><i class="fab fa-x-twitter"></i></a>
+            <div class="d-flex align-items-center gap-3">
+                <a href="#" class="text-white"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="text-white"><i class="fab fa-linkedin"></i></a>
+                <a href="#" class="text-white"><i class="fab fa-x-twitter"></i></a>
 
                 {% if not session.get('user_id') %}
-                <a href="/login" class="btn btn-sm btn-outline-light me-2">Login</a>
+                <a href="/login" class="btn btn-sm btn-outline-light">Login</a>
                 <a href="/register" class="btn btn-sm btn-light">Sign Up</a>
                 {% else %}
                 <a href="/logout" class="btn btn-sm btn-outline-light">Logout</a>
@@ -158,33 +191,28 @@
         </div>
     </nav>
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm nav2 ">
+    <!-- === Main Navbar === -->
+    <nav class="navbar navbar-expand-lg main-navbar sticky-top transparent">
         <div class="container-fluid">
-            <!-- Logo (Far Left) -->
-            <a class="navbar-brand fw-bold me-auto" href="/">
-                Nalepo Organisation
-            </a>
+            <a class="navbar-brand fw-bold" href="/">Nalepo Organisation</a>
 
-            <!-- Toggler (for small screens) -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <!-- Centered Menu Items -->
-            <div class="collapse navbar-collapse justify-content-center" id="mainNavbar">
-                <ul class="navbar-nav">
+            <div class="collapse navbar-collapse justify-content-center" id="mainNav">
+                <ul class="navbar-nav gap-2">
                     <li class="nav-item"><a class="nav-link hover-link" href="/">Home</a></li>
+
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle hover-link" href="/about" id="whoDropdown" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            Who We Are
-                        </a>
+                        <a class="nav-link dropdown-toggle hover-link" href="#" data-bs-toggle="dropdown">Who We Are</a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="/about#about">About</a></li>
                             <li><a class="dropdown-item" href="/about#team">Our Team</a></li>
                             <li><a class="dropdown-item" href="/about#vision">Vision & Mission</a></li>
                         </ul>
                     </li>
+
                     <li class="nav-item"><a class="nav-link hover-link" href="/campaigns">What We Do</a></li>
                     <li class="nav-item"><a class="nav-link hover-link" href="/blogs">Publications</a></li>
                     <li class="nav-item"><a class="nav-link hover-link" href="/events">Events</a></li>
@@ -192,113 +220,110 @@
                 </ul>
             </div>
 
-            <!-- Donate Button (Far Right) -->
-            <div class="d-none d-lg-block ms-auto">
-                <a href="/donate" target="_blank" class="btn btn-success">Donate</a>
+            <div class="d-none d-lg-block">
+                <a href="/donate" class="btn btn-success">Donate</a>
             </div>
         </div>
     </nav>
 
-
-
-    <!-- === Third Navbar (Admin Only) === -->
+    <!-- === Admin Navbar === -->
     {% if session.get('role') == 'admin' %}
-    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm container" style="background-color: darkslategrey;">
+    <nav class="navbar navbar-expand-lg navbar-dark admin-navbar shadow-sm">
         <div class="container">
             <span class="navbar-text text-white fw-semibold me-3">Admin Panel</span>
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="adminNav">
+                <ul class="navbar-nav gap-2 flex-wrap">
                     <li class="nav-item"><a class="nav-link hover-link text-white" href="/manage_users">Manage Users</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link hover-link text-white" href="/manage_volunteers">Manage Volunteers</a>
+                    <li class="nav-item"><a class="nav-link hover-link text-white" href="/manage_volunteers">Manage Volunteers</a>
                     </li>
-                    <li class="nav-item"><a class="nav-link hover-link text-white" href="/view_donations">View
-                            Donations</a></li>
-                    <li class="nav-item"><a class="nav-link hover-link text-white" href="/add_campaigns">Add
-                            Campaign</a>
+                    <li class="nav-item"><a class="nav-link hover-link text-white" href="/view_donations">View Donations</a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link hover-link text-white" href="/add_campaigns">Add Campaign</a>
                     </li>
                     <li class="nav-item"><a class="nav-link hover-link text-white" href="/add_event">Add Event</a></li>
                     <li class="nav-item"><a class="nav-link hover-link text-white" href="/add_blog">Add Publication</a>
                     </li>
-                    <li class="nav-item"><a class="nav-link hover-link text-white" href="/payments">View Payments</a>
-                    </li>
+                    <li class="nav-item"><a class="nav-link hover-link text-white" href="/payments">View Payments</a></li>
                 </ul>
             </div>
         </div>
     </nav>
     {% endif %}
 
-    </ul>
-    </div>
-    </div>
-    </nav>
-
-
-
+    <!-- === Page Content === -->
     <div>
-        {% block content%}
-
-
-
-        {% endblock %}
+        {% block content %}{% endblock %}
     </div>
 
-    <!-- AOS JS -->
+    <!-- === Footer === -->
+    {% block footer %}
+    <footer class="footer mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <h3>Nalepo Organisation</h3>
+                    <p>Empowering lives, restoring hope, and building a better tomorrow through compassion and community-driven action.</p>
+                </div>
+                <div class="col-md-3">
+                    <h3>Quick Links</h3>
+                    <a href="/">Home</a><br>
+                    <a href="/about">Who We Are</a><br>
+                    <a href="/campaigns">What We Do</a><br>
+                    <a href="/events">Events</a><br>
+                    <a href="/blogs">Publications</a><br>
+                    <a href="/contact">Contact Us</a>
+                </div>
+                <div class="col-md-3">
+                    <h3>Branches</h3>
+                    <a href="#">Nairobi CBD</a><br>
+                    <a href="#">Kisumu</a><br>
+                    <a href="#">Mombasa</a><br>
+                    <a href="#">Eldoret</a><br>
+                    <a href="#">Nakuru</a><br>
+                    <a href="#">Narok</a>
+                </div>
+                <div class="col-md-3">
+                    <h3>Reach Us</h3>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-x-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom mt-4">
+                © 2026 Nalepo Organisation | <a href="#" class="text-decoration-none">Developer Leshan</a> | All Rights Reserved
+            </div>
+        </div>
+    </footer>
+    {% endblock %}
+
+    <!-- === AOS JS === -->
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
     <script>
         AOS.init();
     </script>
 
-    <!-- footer -->
-    {% block footer %}
-    <div class="footer">
-        <div class="container">
-            <footer class=" py-3">
-                <div class="div">
-                    <div class="row">
-                        <div class="col">
-                            <h2>NALEPO Organisation</h2>
-                        </div>
-                        <div class="col text-start">
-                            <h3>Quick Links</h3>
-                            <a href="">Home</a><br>
-                            <a href="">Who We Are</a><br>
-                            <a href="">What We DO</a><br>
-                            <a href="">Events</a><br>
-                            <a href="">Publications</a><br>
-                            <a href="">Contact Us</a><br>
-                        </div>
-
-                        <div class="col text-start">
-                            <h3>Branches</h3>
-                            <a href="">Nairobi CBD</a><br>
-                            <a href="">Kisumu</a><br>
-                            <a href="">Mombasa</a><br>
-                            <a href="">Eldoret</a><br>
-                            <a href="">Nakuru</a><br>
-                            <a href="">Narok</a><br>
-                        </div>
-                        <div class="col text-start icons">
-                            <h3 style="margin-bottom: 20px;">Reach Us</h3>
-                            <a href=""><i class="fa-brands fa-x-twitter fa-xl"></i></a>
-                            <a href=""><i class="fa-brands fa-instagram fa-xl"></i></a>
-                            <a href=""><i class="fa-brands fa-linkedin-in fa-xl"></i></a>
-                            <a href=""><i class="fa-brands fa-facebook-f fa-xl"></i></a>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="copyright mt-5">
-                    © 2026 Nalepo Organisation | <a href="#" class=" text-decoration-none">DEVELOPER LESHAN</a> | <a href="#"
-                        class=" text-decoration-none">All Rights Reserved</a>
-                </div>
-            </footer>
-        </div>
-
-    </div>
-    {% endblock %}
-
+    <!-- === Sticky Navbar Scroll JS === -->
+    <script>
+        const navbar = document.querySelector('.main-navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.remove('transparent');
+                navbar.classList.add('solid');
+            } else {
+                navbar.classList.remove('solid');
+                navbar.classList.add('transparent');
+            }
+        });
+    </script>
 
 </body>
 
