@@ -14,8 +14,6 @@ from database import fetch_blogs,fetch_campaigns,fetch_contact,fetch_donation,fe
 
 from flask_bcrypt import Bcrypt
 
-from functools import wraps
-
 from flask_mail import Mail, Message
 
 app = Flask(__name__)
