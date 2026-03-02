@@ -40,17 +40,107 @@ app.config['MAIL_PASSWORD'] = 'znve iqmn dtln arto'
 mail = Mail(app)
 
 bcrypt = Bcrypt(app)
-
 def init_db():
     cur = conn.cursor()
+
+    # Blogs
     cur.execute("""
         CREATE TABLE IF NOT EXISTS blogs (
             blog_id SERIAL PRIMARY KEY,
+            user_id INT,
             title TEXT NOT NULL,
             content TEXT NOT NULL,
             published_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
+
+    # Events
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS events (
+            event_id SERIAL PRIMARY KEY,
+            title TEXT NOT NULL,
+            description TEXT NOT NULL,
+            event_date DATE NOT NULL,
+            location TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    # Campaigns
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS campaigns (
+            campaign_id SERIAL PRIMARY KEY,
+            title TEXT NOT NULL,
+            description TEXT NOT NULL,
+            goal_amount NUMERIC NOT NULL,
+            start_date DATE NOT NULL,
+            end_date DATE NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    # Users
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            user_id SERIAL PRIMARY KEY,
+            name TEXT NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            role TEXT NOT NULL,
+            status TEXT DEFAULT 'pending',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    # Volunteers
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS volunteers (
+            id SERIAL PRIMARY KEY,
+            user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+            full_name TEXT,
+            email TEXT,
+            phone_digits TEXT,
+            period TEXT,
+            skills TEXT,
+            availability TEXT,
+            status TEXT DEFAULT 'Pending',
+            date_applied TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    # Donations
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS donations (
+            donation_id SERIAL PRIMARY KEY,
+            user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
+            campaign_id INT REFERENCES campaigns(campaign_id) ON DELETE CASCADE,
+            amount NUMERIC NOT NULL,
+            donated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    # Payments
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS payments (
+            payment_id SERIAL PRIMARY KEY,
+            donation_id INT REFERENCES donations(donation_id) ON DELETE CASCADE,
+            provider TEXT NOT NULL,
+            amount NUMERIC NOT NULL,
+            paid_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    # Contact / Feedback
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS contact (
+            contact_id SERIAL PRIMARY KEY,
+            name TEXT NOT NULL,
+            email TEXT NOT NULL,
+            message TEXT NOT NULL,
+            submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
     conn.commit()
     cur.close()
 
@@ -92,69 +182,6 @@ def callback():
     print("M-Pesa Callback:", data)
     # TODO: save donation status in DB
     return jsonify({"ResultCode": 0, "ResultDesc": "Accepted"})
-
-# # --- GET ACCESS TOKEN ---
-# def get_access_token():
-#     url = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"  
-#     # ↑ Use sandbox for testing, change to api.safaricom.co.ke when live
-
-#     print("🔑 Requesting Access Token...")
-#     response = requests.get(url, auth=HTTPBasicAuth(CONSUMER_KEY, CONSUMER_SECRET))
-
-#     print("🔎 Response Status Code:", response.status_code)
-#     print("🔎 Raw Response:", response.text)
-
-#     try:
-#         data = response.json()
-#         access_token = data.get("access_token")
-#         if not access_token:
-#             raise Exception("No access_token in response")
-#         print("✅ Access Token Retrieved:", access_token)
-#         return access_token
-#     except Exception as e:
-#         print("❌ Error parsing access token:", e)
-#         raise
-
-# # --- STK PUSH ---
-# def stk_push(phone, amount):
-#     access_token = get_access_token()
-#     url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"  
-
-#     timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-#     password = base64.b64encode((BUSINESS_SHORTCODE + PASSKEY + timestamp).encode()).decode('utf-8')
-
-#     headers = {
-#         "Authorization": f"Bearer {access_token}",
-#         "Content-Type": "application/json"
-#     }
-
-#     payload = {
-#         "BusinessShortCode": BUSINESS_SHORTCODE,
-#         "Password": password,
-#         "Timestamp": timestamp,
-#         "TransactionType": "CustomerPayBillOnline",
-#         "Amount": amount,
-#         "PartyA": phone,  # phone number to be charged
-#         "PartyB": BUSINESS_SHORTCODE,
-#         "PhoneNumber": phone,
-#         "CallBackURL": "https://your-ngrok-url/callback",  # replace with real URL
-#         "AccountReference": "CharityDonation",
-#         "TransactionDesc": "Donation"
-#     }
-
-#     print("📤 Sending STK Push Payload:", payload)
-
-#     response = requests.post(url, json=payload, headers=headers)
-
-#     print("🔎 STK Push Status Code:", response.status_code)
-#     print("🔎 STK Push Response:", response.text)
-
-#     try:
-#         return response.json()
-#     except Exception as e:
-#         print("❌ Error parsing STK Push response:", e)
-#         raise
-
 
 @app.route('/')
 def home():
@@ -262,16 +289,6 @@ def volunteers():
     users = fetch_users()
     return render_template('volunteers.html',volunteers = volunteers, users = users)
 
-# @app.route('/add_volunteer', methods = ['GET','POST'])
-# def add_volunteer():
-#     if request.method == 'POST':
-#         user_id = request.form['uid']
-#         skills = request.form['skills']
-#         availability = request.form['avail']
-#         new_volunteer = (user_id,skills,availability)
-#         insert_volunteers(new_volunteer)
-#         flash("Volunteer added successfully","success")
-#         return redirect(url_for('volunteers'))
     
 @app.route('/add_volunteer', methods=['POST'])
 def add_volunteer():
@@ -303,42 +320,6 @@ def add_volunteer():
     return redirect(url_for('volunteers'))
 
 # submit volunteer
-
-# @app.route('/submit_volunteer', methods=['POST'])
-# def submit_volunteer():
-#     # Grab form data from modal
-#     full_name = request.form['full_name']
-#     email = request.form['email']
-#     phone_digits = request.form['phone_digits']
-#     period = request.form['period']
-#     skills = request.form['skills']
-
-#     cur = conn.cursor()
-    
-#     # Check if user exists in users table
-#     cur.execute("SELECT user_id FROM users WHERE email = %s", (email,))
-#     user = cur.fetchone()
-
-#     if not user:
-#         flash("Please register first to become a volunteer.", "warning")
-#         cur.close()
-#         return redirect(url_for('register'))
-
-#     user_id = user[0]
-
-#     # Insert volunteer request as pending
-#     cur.execute("""
-#         INSERT INTO volunteers (user_id, full_name, email, phone_digits, period, skills, status, date_applied)
-#         VALUES (%s, %s, %s, %s, %s, %s, 'Pending', NOW())
-#     """, (user_id, full_name, email, phone_digits, period, skills))
-
-#     conn.commit()
-#     cur.close()
-
-#     flash("Volunteer application submitted successfully. Please wait for approval.", "success")
-#     return redirect(url_for('volunteers'))
-
-
 @app.route('/submit_volunteer', methods=['POST'])
 def submit_volunteer():
     email = request.form['email']
@@ -477,12 +458,6 @@ def add_event():
     
     return render_template('addevent.html')
 
-# @app.route('/event_registration')
-# def event_registration():
-#     event_registration = fetch_eventreg()
-#     events = fetch_events()
-#     users = fetch_users()
-#     return render_template('event_registration.html',event_registration = event_registration, events = events, users = users)
 
 @app.route('/blogs')
 def blogs():
@@ -781,26 +756,7 @@ def manage_volunteers():
 
     return render_template('manage_volunteers.html', applications=applications)
 
-# @app.route('/manage_volunteers')
-# def manage_volunteers():
-#     # Check if user is admin
-#     if session.get('role') != 'admin':
-#         flash('Access Denied. Admin privileges required.', 'danger')
-#         return redirect(url_for('home'))
-    
-#     cur = conn.cursor()
-        
-#     # Fetch all applications, newest first
-#     cur.execute("SELECT volunteer_id, name.")
-    
-    
-#     return render_template('admin/manage_volunteers.html', applications=applications)
-
-
-
-
 # route to approve admin
-
 @app.route('/approve_user/<int:user_id>')
 def approve_user(user_id):
     if session.get('role') != 'admin':
@@ -881,35 +837,6 @@ def donate():
 
     return render_template("donate.html")
 
-
-# @app.route('/donate/mpesa', methods=['POST'])
-# def donate_mpesa():
-#     fullname = request.form['fullname']
-#     phone = request.form['phone']
-#     amount = request.form['amount']
-
-#     # ✅ Optional: save to database here
-#     # ✅ Optional: call M-Pesa STK push here (via Safaricom Daraja API)
-
-#     # Just for now, let’s confirm it worked
-#     print(f"Name: {fullname}, Phone: {phone}, Amount: {amount}")
-
-#     flash("Thank you for your donation! We’ll process it shortly. 🙏")
-#     return redirect('/donate')
-
-
-# # Initiate Mpesa Express Request
-# @app.route('/pay')
-# def mpesaExpress():
-#     amount = request.args.get('amount')
-#     phone = request.args.get('phone')
-
-#     endpoint = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
-#     acces_token = getAccesstoken()
-#     headers = {"Authorization": "Bearer %s" % acces_token }
-#     timestamp = datetime.now()
-#     times = Timestamp.strftime("%Y%m%d%H%M%S")
-
 @app.route('/subscribe', methods=['POST'])
 def subscribe():
     email = request.form.get('email')
@@ -952,22 +879,9 @@ app.config['MAIL_DEFAULT_SENDER'] = ('Nalepo Organization', 'levy4star@gmail.com
 mail = Mail(app)
 
 
-
-
-
-
-# if __name__ == '__main__':
-#     port = int(os.environ.get("PORT", 5000))
-#     app.run(host='0.0.0.0', port=port)
-
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=True)
-
-
-
-# app.run(debug=True)
-
 
     
 

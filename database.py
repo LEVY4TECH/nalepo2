@@ -1,60 +1,26 @@
 import os
-
 import psycopg2
 
-# DATABASE_URL = os.environ.get("DATABASE_URL")
+DATABASE_URL = os.environ.get("DATABASE_URL")
+conn = psycopg2.connect(DATABASE_URL)
 
-# conn = psycopg2.connect(DATABASE_URL)
+def get_conn():
+    global conn
+    try:
+        conn.cursor()
+    except (psycopg2.InterfaceError, psycopg2.OperationalError):
+        conn = psycopg2.connect(DATABASE_URL)
+    return conn
 
-# conn = psycopg2.connect(user='nalepo_user',password='5bHGAJmRCsHOYSFjppOr7sIL2xQrPpsX',host='dpg-d1l4tqndiees73f7b3h0-a',port='5432',database='nalepo')
-
-if os.environ.get("DATABASE_URL"):
-    # Use Render database
-    conn = psycopg2.connect(os.environ.get("DATABASE_URL"))
-else:
-    # Use your local PostgreSQL credentials
-    conn = psycopg2.connect(
-        dbname='nalepo',
-        user='postgres',
-        password='leshan1234',
-        host='localhost',
-        port='5432'
-    )
-
-cur = conn.cursor()
-
-# def get_connection():
-#     """
-#     Returns a new database connection depending on environment.
-#     """
-#     if os.environ.get("DATABASE_URL"):
-#         # Use Render's PostgreSQL database
-#         return psycopg2.connect(os.environ.get("DATABASE_URL"))
-#     else:
-#         # Use local PostgreSQL
-#         return psycopg2.connect(
-#             dbname='nalepo',
-#             user='postgres',
-#             password='leshan1234',
-#             host='localhost',
-#             port='5432'
-#         )
-
-
-# # fetching data
-# def fetch_users():
-#     cur.execute('select * from users;')
-#     users = cur.fetchall()
-#     cur.close()
-#     return users
+cur = get_conn().cursor()
 
 def fetch_users():
-    with conn.cursor() as cur:
+    with get_conn().cursor() as cur:
         cur.execute('SELECT * FROM users;')
         return cur.fetchall()
 
 def fetch_campaigns():
-    cur = conn.cursor()
+    cur = get_conn().cursor()
     cur.execute("""
             SELECT campaign_id, title,description,goal_amount,start_date,end_date,
             TO_CHAR(created_at, 'Month DD, YYYY')
@@ -83,12 +49,12 @@ def fetch_payments():
 #     return volunteers
 
 def fetch_volunteers():
-    with conn.cursor() as cur:
+    with get_conn().cursor() as cur:
         cur.execute('SELECT * FROM volunteers;')
         return cur.fetchall()
 
 def fetch_events():
-    cur = conn.cursor()
+    cur = get_conn().cursor()
     cur.execute("""
                 SELECT event_id,title,description,event_date,location,
                 TO_CHAR(created_at, 'Month DD, YYYY')
@@ -105,7 +71,7 @@ def fetch_eventreg():
     return eventreg
 
 def fetch_blogs():
-    cur = conn.cursor()
+    cur = get_conn().cursor()
     cur.execute("""
         SELECT blog_id, user_id, title, content, 
         TO_CHAR(published_at, 'Month DD, YYYY') 
@@ -124,7 +90,7 @@ def fetch_blogs():
 #     return contact
 
 def fetch_contact():
-    with conn.cursor() as cur:
+    with get_conn().cursor() as cur:
         cur.execute('SELECT * FROM contact;')
         return cur.fetchall()
 
@@ -132,7 +98,7 @@ def fetch_contact():
 # inserting data
 def insert_users(values):
     insert = "insert into users(name,email,password,role,status)values(%s,%s,%s,%s,%s)"
-    with conn.cursor() as cur:
+    with get_conn().cursor() as cur:
         cur.execute(insert,values)
     conn.commit()
     
@@ -144,7 +110,7 @@ def insert_users(values):
 #     cur.close()
 
 def insert_campaigns(values):
-    with conn.cursor() as cur:
+    with get_conn().cursor() as cur:
         insert = """
             INSERT INTO campaigns (title, description, goal_amount, start_date, end_date)
             VALUES (%s, %s, %s, %s, %s)
@@ -180,7 +146,7 @@ def insert_volunteers(values):
 #     cur.close()
 
 def insert_events(values):
-    with conn.cursor() as cur:
+    with get_conn().cursor() as cur:
         insert = """
             INSERT INTO events (title, description, event_date, location)
             VALUES (%s, %s, %s, %s)
@@ -203,7 +169,7 @@ def insert_event_registration(values):
 def insert_blogs(values):
     insert = "INSERT INTO blogs (user_id, title, content) VALUES (%s, %s, %s)"
 
-    with conn.cursor() as cur:
+    with get_conn().cursor() as cur:
         cur.execute(insert, values)
         conn.commit()
 
@@ -223,7 +189,7 @@ def insert_contact(values):
 
 def check_user(email):
     query = "select * from users where email = %s"
-    with conn.cursor() as cur:
+    with get_conn().cursor() as cur:
         cur.execute(query, (email,))
         user = cur.fetchone()
     return user
